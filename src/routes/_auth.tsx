@@ -60,9 +60,9 @@ function AuthLayout() {
     },
     {
       label: 'Reminders',
-      to: '#',
+      to: '/reminders',
       icon: Bell,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
   ]
 
