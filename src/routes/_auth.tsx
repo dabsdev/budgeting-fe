@@ -47,9 +47,9 @@ function AuthLayout() {
     },
     {
       label: 'Wallets',
-      to: '#',
+      to: '/wallets',
       icon: Wallet,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       label: 'Budgets',
