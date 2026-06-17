@@ -27,7 +27,9 @@ export async function apiFetch<T>(
 
   // 1. Build URL with query parameters
   const urlString = path.startsWith("http") ? path : `${BACKEND_URL}${path}`;
-  const url = new URL(urlString);
+  const url = urlString.startsWith("http")
+    ? new URL(urlString)
+    : new URL(urlString, window.location.origin);
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
