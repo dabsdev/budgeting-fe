@@ -6,6 +6,7 @@ import { useLogoutMutation } from '@/features/auth/api/auth.mutations'
 import { LayoutDashboard, Wallet, PiggyBank, Bell, LogOut, Menu, X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { motion, AnimatePresence } from 'motion/react'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/_auth')({
   loader: async ({ location }) => {
@@ -113,11 +114,15 @@ function AuthLayout() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-all cursor-pointer"
               activeProps={{
-                className: "flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl bg-zinc-900 text-white hover:bg-zinc-900 hover:text-white shadow-sm"
+                className: "bg-zinc-900 !text-white hover:bg-zinc-900 hover:!text-white shadow-sm font-semibold"
               }}
             >
-              <Icon className="size-4.5" />
-              <span>{item.label}</span>
+              {({ isActive }) => (
+                <>
+                  <Icon className={cn("size-4.5", isActive ? "text-white" : "text-zinc-400")} />
+                  <span>{item.label}</span>
+                </>
+              )}
             </Link>
           )
         })}

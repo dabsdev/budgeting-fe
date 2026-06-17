@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { walletSchema } from "../api/wallet.contract";
 import { useCreateWalletMutation, useUpdateWalletMutation } from "../api/wallet.mutations";
@@ -22,6 +22,48 @@ export function WalletFormDialog({ isOpen, onClose, wallet }: WalletFormDialogPr
 
   const isEditing = !!wallet;
   const isPending = createWalletMutation.isPending || updateWalletMutation.isPending;
+
+  // Local state for currency formatted display
+  const [balanceInput, setBalanceInput] = useState("0");
+
+  const handleBalanceChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    handleChange: (v: number) => void
+  ) => {
+    const input = e.target;
+    const rawVal = input.value;
+    const selectionStart = input.selectionStart || 0;
+
+    // Count non-digit characters before cursor
+    const valBeforeCursor = rawVal.substring(0, selectionStart);
+    const digitsBeforeCursor = valBeforeCursor.replace(/\D/g, "").length;
+
+    // Clean all non-digits
+    const cleanVal = rawVal.replace(/\D/g, "");
+    const numericVal = Number(cleanVal) || 0;
+
+    // Format with dots
+    const formattedVal = cleanVal === "" ? "" : cleanVal.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    setBalanceInput(formattedVal);
+    handleChange(numericVal);
+
+    // Restore cursor position based on digit count
+    requestAnimationFrame(() => {
+      let newCursorPosition = 0;
+      let digitCount = 0;
+      for (let i = 0; i < formattedVal.length; i++) {
+        if (digitCount === digitsBeforeCursor) {
+          break;
+        }
+        if (/\d/.test(formattedVal[i])) {
+          digitCount++;
+        }
+        newCursorPosition = i + 1;
+      }
+      input.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+  };
 
   // TanStack Form configuration
   const form = useForm({
@@ -59,9 +101,16 @@ export function WalletFormDialog({ isOpen, onClose, wallet }: WalletFormDialogPr
     if (isOpen) {
       if (wallet) {
         form.setFieldValue("name", wallet.name);
-        form.setFieldValue("balance", Math.round(Number(wallet.balance)) || 0);
+        const bal = Math.round(Number(wallet.balance)) || 0;
+        form.setFieldValue("balance", bal);
+        setTimeout(() => {
+          setBalanceInput(bal === 0 ? "0" : bal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        }, 0);
       } else {
         form.reset();
+        setTimeout(() => {
+          setBalanceInput("0");
+        }, 0);
       }
     }
   }, [isOpen, wallet, form]);
@@ -178,10 +227,10 @@ export function WalletFormDialog({ isOpen, onClose, wallet }: WalletFormDialogPr
                           <Input
                             id={field.name}
                             name={field.name}
-                            type="number"
-                            value={field.state.value}
+                            type="text"
+                            value={balanceInput}
                             onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.valueAsNumber || 0)}
+                            onChange={(e) => handleBalanceChange(e, field.handleChange)}
                             placeholder="0"
                             className={cn(
                               "rounded-xl border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 focus-visible:border-zinc-950 shadow-sm",
