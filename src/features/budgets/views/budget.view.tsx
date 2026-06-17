@@ -202,7 +202,7 @@ export function BudgetView() {
                 <div className="fixed inset-0 z-20 cursor-default" onClick={() => setIsPopoverOpen(false)} />
 
                 {/* Calendar Month/Year popover panel */}
-                <div className="absolute right-0 top-12 z-30 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg">
+                <div className="absolute left-0 md:left-auto md:right-0 top-12 z-30 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg">
                   {/* Popover Header */}
                   <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-100">
                     <button
