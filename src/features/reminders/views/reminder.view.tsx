@@ -12,9 +12,6 @@ import {
   FolderOpen,
   ChevronLeft,
   ChevronRight,
-  Calendar,
-  Layers,
-  CircleDollarSign,
 } from "lucide-react";
 import type { Reminder } from "../api/reminder.contract";
 
@@ -39,20 +36,7 @@ export function ReminderView() {
   const [selectedReminder, setSelectedReminder] = useState<Reminder | null>(null);
   const [hoveredReminderId, setHoveredReminderId] = useState<string | null>(null);
 
-  // Compute stats
-  const activeReminders = reminders.filter((r) => r.is_active);
-  const totalMonthlyBills = activeReminders.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
 
-  const nextReminder = (() => {
-    if (activeReminders.length === 0) return null;
-    const todayDay = new Date().getDate();
-    const sorted = [...activeReminders].sort((a, b) => {
-      const diffA = a.day_of_month >= todayDay ? a.day_of_month - todayDay : (a.day_of_month + 31) - todayDay;
-      const diffB = b.day_of_month >= todayDay ? b.day_of_month - todayDay : (b.day_of_month + 31) - todayDay;
-      return diffA - diffB;
-    });
-    return sorted[0];
-  })();
 
   const handleAddClick = () => {
     setSelectedReminder(null);
@@ -140,55 +124,6 @@ export function ReminderView() {
           <span>Add Reminder</span>
         </button>
       </div>
-
-      {/* Overview Stats Banner */}
-      {!isLoading && reminders.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 animate-in fade-in duration-300">
-          {/* Stats 1: Total Commitments */}
-          <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4 shadow-xs select-none">
-            <div className="size-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-              <CircleDollarSign className="size-5.5" />
-            </div>
-            <div className="space-y-0.5 text-left min-w-0">
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Monthly Commitment</span>
-              <h4 className="text-lg font-bold text-zinc-900 tracking-tight truncate">
-                {formatCurrency(totalMonthlyBills)}
-              </h4>
-            </div>
-          </div>
-
-          {/* Stats 2: Active Reminders */}
-          <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4 shadow-xs select-none">
-            <div className="size-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-              <Layers className="size-5.5" />
-            </div>
-            <div className="space-y-0.5 text-left min-w-0">
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Active Reminders</span>
-              <h4 className="text-lg font-bold text-zinc-900 tracking-tight truncate">
-                {activeReminders.length} <span className="text-xs text-zinc-400 font-normal">active</span>
-              </h4>
-            </div>
-          </div>
-
-          {/* Stats 3: Next Bill */}
-          <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4 shadow-xs select-none">
-            <div className="size-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-              <Calendar className="size-5.5" />
-            </div>
-            <div className="space-y-0.5 text-left min-w-0 flex-1">
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Next Bill Due</span>
-              <h4 className="text-lg font-bold text-zinc-900 tracking-tight truncate" title={nextReminder?.description}>
-                {nextReminder ? nextReminder.description : "None"}
-              </h4>
-              {nextReminder && (
-                <span className="text-[10px] text-zinc-400 font-medium block">
-                  {getDaysRemainingText(nextReminder.day_of_month)}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main Content (List / Grid) */}
       {isLoading ? (

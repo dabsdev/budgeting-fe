@@ -54,9 +54,9 @@ function AuthLayout() {
     },
     {
       label: 'Budgets',
-      to: '#',
+      to: '/budgets',
       icon: PiggyBank,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       label: 'Reminders',

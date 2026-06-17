@@ -9,13 +9,10 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Wallet as WalletIcon,
   AlertCircle,
   FolderOpen,
   ChevronLeft,
   ChevronRight,
-  PiggyBank,
-  Layers,
   CreditCard,
 } from "lucide-react";
 import type { Wallet } from "../api/wallet.contract";
@@ -108,11 +105,7 @@ export function WalletView() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
-  // Compute stats
-  const totalBalance = wallets.reduce((sum, w) => sum + (Number(w.balance) || 0), 0);
-  const primaryWallet = wallets.length > 0
-    ? [...wallets].sort((a, b) => Number(b.balance) - Number(a.balance))[0]
-    : null;
+
 
   const handleAddClick = () => {
     setSelectedWallet(null);
@@ -188,47 +181,6 @@ export function WalletView() {
           <span>Add Wallet</span>
         </button>
       </div>
-
-      {/* Overview Stats Banner */}
-      {!isLoading && wallets.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 animate-in fade-in duration-300">
-          <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4 shadow-xs select-none">
-            <div className="size-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-              <PiggyBank className="size-5.5" />
-            </div>
-            <div className="space-y-0.5 text-left min-w-0">
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Total Balance</span>
-              <h4 className="text-lg font-bold text-zinc-900 tracking-tight truncate">
-                {formatCurrency(totalBalance)}
-              </h4>
-            </div>
-          </div>
-
-          <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4 shadow-xs select-none">
-            <div className="size-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-              <Layers className="size-5.5" />
-            </div>
-            <div className="space-y-0.5 text-left min-w-0">
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Total Accounts</span>
-              <h4 className="text-lg font-bold text-zinc-900 tracking-tight truncate">
-                {wallets.length} <span className="text-xs text-zinc-400 font-normal">wallet(s)</span>
-              </h4>
-            </div>
-          </div>
-
-          <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4 shadow-xs select-none">
-            <div className="size-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-              <WalletIcon className="size-5.5" />
-            </div>
-            <div className="space-y-0.5 text-left min-w-0">
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase">Primary Source</span>
-              <h4 className="text-lg font-bold text-zinc-900 tracking-tight truncate" title={primaryWallet?.name}>
-                {primaryWallet?.name || "None"}
-              </h4>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main Content (List / Grid) */}
       {isLoading ? (
