@@ -15,6 +15,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthWalletsRouteImport } from './routes/_auth/wallets'
+import { Route as AuthTransactionsRouteImport } from './routes/_auth/transactions'
 import { Route as AuthRemindersRouteImport } from './routes/_auth/reminders'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthBudgetsRouteImport } from './routes/_auth/budgets'
@@ -48,6 +49,11 @@ const AuthWalletsRoute = AuthWalletsRouteImport.update({
   path: '/wallets',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthTransactionsRoute = AuthTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthRemindersRoute = AuthRemindersRouteImport.update({
   id: '/reminders',
   path: '/reminders',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/budgets': typeof AuthBudgetsRoute
   '/dashboard': typeof AuthDashboardRoute
   '/reminders': typeof AuthRemindersRoute
+  '/transactions': typeof AuthTransactionsRoute
   '/wallets': typeof AuthWalletsRoute
 }
 export interface FileRoutesByTo {
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/budgets': typeof AuthBudgetsRoute
   '/dashboard': typeof AuthDashboardRoute
   '/reminders': typeof AuthRemindersRoute
+  '/transactions': typeof AuthTransactionsRoute
   '/wallets': typeof AuthWalletsRoute
 }
 export interface FileRoutesById {
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_auth/budgets': typeof AuthBudgetsRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/reminders': typeof AuthRemindersRoute
+  '/_auth/transactions': typeof AuthTransactionsRoute
   '/_auth/wallets': typeof AuthWalletsRoute
 }
 export interface FileRouteTypes {
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/budgets'
     | '/dashboard'
     | '/reminders'
+    | '/transactions'
     | '/wallets'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/budgets'
     | '/dashboard'
     | '/reminders'
+    | '/transactions'
     | '/wallets'
   id:
     | '__root__'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_auth/budgets'
     | '/_auth/dashboard'
     | '/_auth/reminders'
+    | '/_auth/transactions'
     | '/_auth/wallets'
   fileRoutesById: FileRoutesById
 }
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthWalletsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/transactions': {
+      id: '/_auth/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AuthTransactionsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/reminders': {
       id: '/_auth/reminders'
       path: '/reminders'
@@ -210,6 +229,7 @@ interface AuthRouteChildren {
   AuthBudgetsRoute: typeof AuthBudgetsRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthRemindersRoute: typeof AuthRemindersRoute
+  AuthTransactionsRoute: typeof AuthTransactionsRoute
   AuthWalletsRoute: typeof AuthWalletsRoute
 }
 
@@ -217,6 +237,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthBudgetsRoute: AuthBudgetsRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthRemindersRoute: AuthRemindersRoute,
+  AuthTransactionsRoute: AuthTransactionsRoute,
   AuthWalletsRoute: AuthWalletsRoute,
 }
 

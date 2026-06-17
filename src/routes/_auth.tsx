@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { createFileRoute, redirect, Outlet, Link } from '@tanstack/react-router'
 import { getUserinfo } from '@/features/auth/api/auth.api'
 import { useLogoutMutation } from '@/features/auth/api/auth.mutations'
-import { LayoutDashboard, Wallet, PiggyBank, Bell, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Wallet, PiggyBank, Bell, LogOut, Menu, X, ArrowUpDown } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { motion, AnimatePresence } from 'motion/react'
 import { cn } from '@/lib/utils'
@@ -44,6 +44,12 @@ function AuthLayout() {
       label: 'Dashboard',
       to: '/dashboard',
       icon: LayoutDashboard,
+      isPlaceholder: false,
+    },
+    {
+      label: 'Transactions',
+      to: '/transactions',
+      icon: ArrowUpDown,
       isPlaceholder: false,
     },
     {
