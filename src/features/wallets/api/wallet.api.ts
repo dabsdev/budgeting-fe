@@ -1,10 +1,9 @@
 import { apiFetch } from "@/lib/http";
 import type { Wallet, CreateWalletInput, UpdateWalletInput } from "./wallet.contract";
 
-export async function getWallets(params?: { page?: number; limit?: number }) {
+export async function getWallets() {
   return await apiFetch<Wallet[]>("/wallets", {
     method: "GET",
-    params,
   });
 }
 

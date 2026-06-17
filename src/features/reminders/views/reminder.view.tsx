@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useRemindersQuery } from "../api/reminder.queries";
 import { ReminderFormDialog } from "../components/reminder-form-dialog";
 import { ReminderDeleteDialog } from "../components/reminder-delete-dialog";
@@ -10,23 +9,13 @@ import {
   Trash2,
   AlertCircle,
   FolderOpen,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import type { Reminder } from "../api/reminder.contract";
 
 export function ReminderView() {
-  const search = useSearch({ strict: false }) as Record<string, string | number | undefined>;
-  const navigate = useNavigate();
-
-  // Extract pagination values from search parameters
-  const page = Number(search.page) || 1;
-  const limit = Number(search.limit) || 10;
-
   // Fetch reminders list
-  const { data: response, isLoading, isError, error, refetch } = useRemindersQuery({ page, limit });
+  const { data: response, isLoading, isError, error, refetch } = useRemindersQuery();
   const reminders = response?.data || [];
-  const pagination = response?.pagination;
 
 
 
@@ -53,29 +42,6 @@ export function ReminderView() {
     setIsDeleteOpen(true);
   };
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      void navigate({
-        to: "/reminders",
-        search: {
-          page: page - 1,
-          limit,
-        },
-      });
-    }
-  };
-
-  const handleNextPage = () => {
-    if (pagination?.hasNextPage) {
-      void navigate({
-        to: "/reminders",
-        search: {
-          page: page + 1,
-          limit,
-        },
-      });
-    }
-  };
 
   const getDaysRemainingText = (dueDay: number) => {
     const todayDay = new Date().getDate();
@@ -262,31 +228,6 @@ export function ReminderView() {
         </div>
       )}
 
-      {/* Pagination Controls */}
-      {!isLoading && reminders.length > 0 && pagination && (
-        <div className="flex items-center justify-between pt-4 border-t border-zinc-150 mt-8 select-none">
-          <span className="text-xs font-semibold text-zinc-500">
-            Page {page}
-          </span>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrevPage}
-              disabled={page <= 1}
-              className="size-9 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 disabled:opacity-40 transition-all cursor-pointer"
-            >
-              <ChevronLeft className="size-4 text-zinc-700" />
-            </button>
-            <button
-              onClick={handleNextPage}
-              disabled={!pagination.hasNextPage}
-              className="size-9 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 disabled:opacity-40 transition-all cursor-pointer"
-            >
-              <ChevronRight className="size-4 text-zinc-700" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Dialog Modals */}
       <ReminderFormDialog

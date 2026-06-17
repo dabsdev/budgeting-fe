@@ -150,7 +150,7 @@ function AuthLayout() {
   return (
     <div className="min-h-screen bg-zinc-50/30 flex flex-col md:flex-row">
       {/* Sidebar for Desktop */}
-      <aside className="hidden md:block w-64 shrink-0 h-screen sticky top-0">
+      <aside className="hidden md:block w-64 shrink-0 h-screen sticky top-0 z-30">
         {sidebarContent}
       </aside>
 

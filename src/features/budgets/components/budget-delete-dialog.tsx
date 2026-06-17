@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, X, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Budget } from "../api/budget.contract";
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 interface BudgetDeleteDialogProps {
   isOpen: boolean;
@@ -22,17 +24,26 @@ export function BudgetDeleteDialog({ isOpen, onClose, budget }: BudgetDeleteDial
     });
   };
 
-  return (
+  useEffect(() => {
+    if (isOpen && budget) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, budget]);
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && budget && (
         <>
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black/40 z-40"
           />
 
           {/* Modal Container */}
@@ -98,6 +109,7 @@ export function BudgetDeleteDialog({ isOpen, onClose, budget }: BudgetDeleteDial
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

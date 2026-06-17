@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { reminderSchema } from "../api/reminder.contract";
 import { useCreateReminderMutation, useUpdateReminderMutation } from "../api/reminder.mutations";
@@ -9,6 +9,7 @@ import { Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { Reminder } from "../api/reminder.contract";
+import { createPortal } from "react-dom";
 
 interface ReminderFormDialogProps {
   isOpen: boolean;
@@ -17,17 +18,26 @@ interface ReminderFormDialogProps {
 }
 
 export function ReminderFormDialog({ isOpen, onClose, reminder }: ReminderFormDialogProps) {
-  return (
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black/40 z-40"
           />
 
           {/* Modal Container */}
@@ -67,7 +77,8 @@ export function ReminderFormDialog({ isOpen, onClose, reminder }: ReminderFormDi
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 

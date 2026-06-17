@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/http";
 import type { Reminder, CreateReminderInput, UpdateReminderInput } from "./reminder.contract";
 
-export async function getReminders(params?: { page?: number; limit?: number }) {
+export async function getReminders(params?: { search?: string }) {
   return await apiFetch<Reminder[]>("/recurring-reminders", {
     method: "GET",
     params,

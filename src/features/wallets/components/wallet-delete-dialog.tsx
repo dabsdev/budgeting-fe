@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, X, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Wallet } from "../api/wallet.contract";
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 interface WalletDeleteDialogProps {
   isOpen: boolean;
@@ -22,17 +24,26 @@ export function WalletDeleteDialog({ isOpen, onClose, wallet }: WalletDeleteDial
     });
   };
 
-  return (
+  useEffect(() => {
+    if (isOpen && wallet) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, wallet]);
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && wallet && (
         <>
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black/40 z-40"
           />
 
           {/* Modal Container */}
@@ -98,6 +109,7 @@ export function WalletDeleteDialog({ isOpen, onClose, wallet }: WalletDeleteDial
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

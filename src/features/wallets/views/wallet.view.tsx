@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useWalletsQuery } from "../api/wallet.queries";
 import { WalletFormDialog } from "../components/wallet-form-dialog";
 import { WalletDeleteDialog } from "../components/wallet-delete-dialog";
@@ -11,8 +10,6 @@ import {
   Trash2,
   AlertCircle,
   FolderOpen,
-  ChevronLeft,
-  ChevronRight,
   CreditCard,
 } from "lucide-react";
 import type { Wallet } from "../api/wallet.contract";
@@ -88,17 +85,10 @@ const getCardTheme = (name: string) => {
 
 export function WalletView() {
   const user = AuthRoute.useLoaderData();
-  const search = useSearch({ strict: false }) as Record<string, string | number | undefined>;
-  const navigate = useNavigate();
-
-  // Extract pagination values from search parameters
-  const page = Number(search.page) || 1;
-  const limit = Number(search.limit) || 10;
 
   // Fetch wallets list
-  const { data: response, isLoading, isError, error, refetch } = useWalletsQuery({ page, limit });
+  const { data: response, isLoading, isError, error, refetch } = useWalletsQuery();
   const wallets = response?.data || [];
-  const pagination = response?.pagination;
 
   // Modal Dialog local states
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -122,29 +112,6 @@ export function WalletView() {
     setIsDeleteOpen(true);
   };
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      void navigate({
-        to: "/wallets",
-        search: {
-          page: page - 1,
-          limit,
-        },
-      });
-    }
-  };
-
-  const handleNextPage = () => {
-    if (pagination?.hasNextPage) {
-      void navigate({
-        to: "/wallets",
-        search: {
-          page: page + 1,
-          limit,
-        },
-      });
-    }
-  };
 
   if (isError) {
     return (
@@ -357,31 +324,6 @@ export function WalletView() {
         </div>
       )}
 
-      {/* Pagination Controls */}
-      {!isLoading && wallets.length > 0 && pagination && (
-        <div className="flex items-center justify-between pt-4 border-t border-zinc-150 mt-8 select-none">
-          <span className="text-xs font-semibold text-zinc-500">
-            Page {page}
-          </span>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrevPage}
-              disabled={page <= 1}
-              className="size-9 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 disabled:opacity-40 transition-all cursor-pointer"
-            >
-              <ChevronLeft className="size-4 text-zinc-700" />
-            </button>
-            <button
-              onClick={handleNextPage}
-              disabled={!pagination.hasNextPage}
-              className="size-9 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 disabled:opacity-40 transition-all cursor-pointer"
-            >
-              <ChevronRight className="size-4 text-zinc-700" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Dialog Modals */}
       <WalletFormDialog

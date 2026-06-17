@@ -3,7 +3,7 @@ import { getReminders } from "./reminder.api";
 
 export const REMINDERS_QUERY_KEY = ["recurring-reminders"];
 
-export function useRemindersQuery(params?: { page?: number; limit?: number }) {
+export function useRemindersQuery(params?: { search?: string }) {
   return useQuery({
     queryKey: [...REMINDERS_QUERY_KEY, params],
     queryFn: () => getReminders(params),

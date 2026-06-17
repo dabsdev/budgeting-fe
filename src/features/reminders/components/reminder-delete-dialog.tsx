@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, X, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Reminder } from "../api/reminder.contract";
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 interface ReminderDeleteDialogProps {
   isOpen: boolean;
@@ -22,17 +24,26 @@ export function ReminderDeleteDialog({ isOpen, onClose, reminder }: ReminderDele
     });
   };
 
-  return (
+  useEffect(() => {
+    if (isOpen && reminder) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, reminder]);
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && reminder && (
         <>
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black/40 z-40"
           />
 
           {/* Modal Container */}
@@ -98,6 +109,7 @@ export function ReminderDeleteDialog({ isOpen, onClose, reminder }: ReminderDele
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

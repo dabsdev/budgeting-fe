@@ -9,6 +9,7 @@ import { Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { Wallet } from "../api/wallet.contract";
+import { createPortal } from "react-dom";
 
 interface WalletFormDialogProps {
   isOpen: boolean;
@@ -115,17 +116,26 @@ export function WalletFormDialog({ isOpen, onClose, wallet }: WalletFormDialogPr
     }
   }, [isOpen, wallet, form]);
 
-  return (
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black/40 z-40"
           />
 
           {/* Modal Container */}
@@ -299,6 +309,7 @@ export function WalletFormDialog({ isOpen, onClose, wallet }: WalletFormDialogPr
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

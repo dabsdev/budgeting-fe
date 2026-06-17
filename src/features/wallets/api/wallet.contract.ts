@@ -19,11 +19,4 @@ export interface Wallet {
   deleted_at: string | null;
 }
 
-export interface GetWalletsResponse {
-  data: Wallet[];
-  pagination: {
-    page: number;
-    limit: number;
-    hasNextPage: boolean;
-  };
-}
+

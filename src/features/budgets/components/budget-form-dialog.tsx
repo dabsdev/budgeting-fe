@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { Budget } from "../api/budget.contract";
 import { useCreateBudgetMutation as useCreateBudgetMutationHook, useUpdateBudgetMutation as useUpdateBudgetMutationHook } from "../api/budget.mutations";
+import { createPortal } from "react-dom";
 
 interface BudgetFormDialogProps {
   isOpen: boolean;
@@ -148,27 +149,29 @@ export function BudgetFormDialog({ isOpen, onClose, budget }: BudgetFormDialogPr
         // Parse month_year format (handles YYYY-MM and MM-YYYY)
         if (budget.month_year && budget.month_year.includes("-")) {
           const parts = budget.month_year.split("-");
-          if (parts[0].length === 4) {
-            // YYYY-MM
-            setSelectedYear(parts[0]);
-            setSelectedMonth(parts[1]);
-          } else {
-            // MM-YYYY
-            setSelectedMonth(parts[0]);
-            setSelectedYear(parts[1]);
-          }
+          setTimeout(() => {
+            if (parts[0].length === 4) {
+              // YYYY-MM
+              setSelectedYear(parts[0]);
+              setSelectedMonth(parts[1]);
+            } else {
+              // MM-YYYY
+              setSelectedMonth(parts[0]);
+              setSelectedYear(parts[1]);
+            }
+          }, 0);
           form.setFieldValue("month_year", budget.month_year);
         }
       } else {
         form.reset();
         const m = String(new Date().getMonth() + 1).padStart(2, "0");
         const y = String(new Date().getFullYear());
-        setSelectedMonth(m);
-        setSelectedYear(y);
-        form.setFieldValue("month_year", `${y}-${m}`);
         setTimeout(() => {
+          setSelectedMonth(m);
+          setSelectedYear(y);
           setAmountInput("");
         }, 0);
+        form.setFieldValue("month_year", `${y}-${m}`);
       }
     }
   }, [isOpen, budget, form]);
@@ -178,17 +181,26 @@ export function BudgetFormDialog({ isOpen, onClose, budget }: BudgetFormDialogPr
     form.setFieldValue("month_year", `${selectedYear}-${selectedMonth}`);
   }, [selectedMonth, selectedYear, form]);
 
-  return (
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black/40 z-40"
           />
 
           {/* Modal Container */}
@@ -410,6 +422,7 @@ export function BudgetFormDialog({ isOpen, onClose, budget }: BudgetFormDialogPr
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
