@@ -83,7 +83,7 @@ function MonthYearPicker({ selectedMonth, selectedYear, onChange }: MonthYearPic
       {isOpen && (
         <>
           <div className="fixed inset-0 z-45 cursor-default" onClick={() => setIsOpen(false)} />
-          <div className="absolute left-0 bottom-full mb-2 z-50 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-bottom-2 duration-150">
+          <div className="absolute left-0 top-12.5 z-50 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-top-2 duration-150">
             <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
               <button
                 type="button"
@@ -306,7 +306,7 @@ export function BudgetFormDialog({ isOpen, onClose, budget }: BudgetFormDialogPr
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white border border-zinc-150 rounded-2xl w-full max-w-md shadow-xl overflow-hidden relative"
+              className="bg-white border border-zinc-150 rounded-2xl w-full max-w-md shadow-xl relative"
             >
               {/* Close Button */}
               <button

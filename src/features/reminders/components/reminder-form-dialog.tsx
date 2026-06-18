@@ -5,11 +5,74 @@ import { useCreateReminderMutation, useUpdateReminderMutation } from "../api/rem
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, Calendar, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { Reminder } from "../api/reminder.contract";
 import { createPortal } from "react-dom";
+
+interface DayPickerProps {
+  value: number;
+  onChange: (val: number) => void;
+}
+
+function DayPicker({ value, onChange }: DayPickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  return (
+    <div className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "flex items-center justify-between gap-2.5 rounded-xl border border-zinc-200 bg-white h-11 px-4 text-sm w-full text-left focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 shadow-sm transition-all cursor-pointer select-none",
+          isOpen && "ring-1 ring-zinc-950 border-zinc-950"
+        )}
+      >
+        <div className="flex items-center gap-2.5 truncate">
+          <Calendar className="size-4 text-zinc-400 shrink-0 pointer-events-none" />
+          <span className="font-semibold text-zinc-900">{value || 1}</span>
+        </div>
+        <ChevronDown className={cn("size-4 text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-45 cursor-default" onClick={() => setIsOpen(false)} />
+          <div className="absolute left-0 top-12.5 z-50 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none w-72 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="flex items-center justify-center pb-1.5 border-b border-zinc-100">
+              <span className="font-bold text-sm text-zinc-800">Select Day</span>
+            </div>
+            <div className="grid grid-cols-7 gap-1.5">
+              {days.map((day) => {
+                const isSelected = value === day;
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => {
+                      onChange(day);
+                      setIsOpen(false);
+                    }}
+                    className={cn(
+                      "size-8 text-xs font-semibold rounded-lg flex items-center justify-center transition-all cursor-pointer border-0",
+                      isSelected
+                        ? "bg-zinc-900 text-white shadow-sm hover:bg-zinc-850"
+                        : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
+                    )}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 interface ReminderFormDialogProps {
   isOpen: boolean;
@@ -47,7 +110,7 @@ export function ReminderFormDialog({ isOpen, onClose, reminder }: ReminderFormDi
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white border border-zinc-150 rounded-2xl w-full max-w-md shadow-xl overflow-hidden relative"
+              className="bg-white border border-zinc-150 rounded-2xl w-full max-w-md shadow-xl relative"
             >
               {/* Close Button */}
               <button
@@ -141,7 +204,7 @@ function ReminderForm({ reminder, onClose }: ReminderFormProps) {
     defaultValues: {
       description: reminder?.description || "",
       amount: reminder ? Math.round(Number(reminder.amount)) : (null as unknown as number),
-      day_of_month: reminder ? Number(reminder.day_of_month) : (null as unknown as number),
+      day_of_month: reminder ? Number(reminder.day_of_month) : 1,
       is_active: reminder ? !!reminder.is_active : true,
     },
     validators: {
@@ -286,23 +349,9 @@ function ReminderForm({ reminder, onClose }: ReminderFormProps) {
               <Label htmlFor={field.name} className="text-xs font-semibold text-zinc-500 tracking-wide uppercase select-none">
                 Due Day of Month (1 - 31)
               </Label>
-              <Input
-                id={field.name}
-                name={field.name}
-                type="number"
-                min="1"
-                max="31"
-                value={field.state.value === null || field.state.value === undefined ? "" : field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  field.handleChange(val === "" ? (null as unknown as number) : Number(val));
-                }}
-                placeholder="e.g. 17"
-                className={cn(
-                  "rounded-xl border border-zinc-200 bg-white h-11 px-4 text-sm w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 focus-visible:border-zinc-950 shadow-sm",
-                  hasError && "border-destructive focus-visible:ring-destructive"
-                )}
+              <DayPicker
+                value={field.state.value}
+                onChange={field.handleChange}
               />
               <AnimatePresence>
                 {hasError && (

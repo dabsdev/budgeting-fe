@@ -286,19 +286,22 @@ export function TransactionView() {
                 setIsWalletPopoverOpen(false);
                 setIsDatePopoverOpen(false);
               }}
-              className="flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full sm:w-auto"
+              className={cn(
+                "flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full sm:w-auto",
+                isTypePopoverOpen && "ring-1 ring-zinc-950 border-zinc-950"
+              )}
             >
               <div className="flex items-center gap-2">
                 <ArrowUpDown className="size-3.5 text-zinc-400" />
                 <span>{selectedTypeLabel}</span>
               </div>
-              <ChevronDown className="size-3.5 text-zinc-400 shrink-0" />
+              <ChevronDown className={cn("size-3.5 text-zinc-400 shrink-0 transition-transform duration-200", isTypePopoverOpen && "rotate-180")} />
             </button>
 
             {isTypePopoverOpen && (
               <>
                 <div className="fixed inset-0 z-20 cursor-default" onClick={() => setIsTypePopoverOpen(false)} />
-                <div className="absolute left-0 top-11 z-30 w-40 bg-white border border-zinc-150 rounded-2xl p-1.5 shadow-lg flex flex-col gap-0.5">
+                <div className="absolute left-0 top-11.5 z-30 w-40 bg-white border border-zinc-150 rounded-2xl p-1.5 shadow-lg flex flex-col gap-0.5 animate-in fade-in slide-in-from-top-2 duration-150">
                   <button
                     type="button"
                     onClick={() => {
@@ -373,19 +376,22 @@ export function TransactionView() {
                 setIsTypePopoverOpen(false);
                 setIsDatePopoverOpen(false);
               }}
-              className="flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full sm:w-auto"
+              className={cn(
+                "flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full sm:w-auto",
+                isWalletPopoverOpen && "ring-1 ring-zinc-950 border-zinc-950"
+              )}
             >
               <div className="flex items-center gap-2">
                 <WalletIcon className="size-3.5 text-zinc-400" />
                 <span>{selectedWalletLabel}</span>
               </div>
-              <ChevronDown className="size-3.5 text-zinc-400 shrink-0" />
+              <ChevronDown className={cn("size-3.5 text-zinc-400 shrink-0 transition-transform duration-200", isWalletPopoverOpen && "rotate-180")} />
             </button>
 
             {isWalletPopoverOpen && (
               <>
                 <div className="fixed inset-0 z-20 cursor-default" onClick={() => setIsWalletPopoverOpen(false)} />
-                <div className="absolute left-0 top-11 z-30 w-48 max-h-60 overflow-y-auto bg-white border border-zinc-150 rounded-2xl p-1.5 shadow-lg flex flex-col gap-0.5">
+                <div className="absolute left-0 top-11.5 z-30 w-48 max-h-60 overflow-y-auto bg-white border border-zinc-150 rounded-2xl p-1.5 shadow-lg flex flex-col gap-0.5 animate-in fade-in slide-in-from-top-2 duration-150">
                   <button
                     type="button"
                     onClick={() => {
@@ -433,13 +439,16 @@ export function TransactionView() {
                 setIsTypePopoverOpen(false);
                 setIsWalletPopoverOpen(false);
               }}
-              className="flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full sm:w-auto"
+              className={cn(
+                "flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full sm:w-auto",
+                isDatePopoverOpen && "ring-1 ring-zinc-950 border-zinc-950"
+              )}
             >
               <div className="flex items-center gap-2">
                 <Calendar className="size-3.5 text-zinc-400" />
                 <span>{selectedDateLabel}</span>
               </div>
-              <ChevronDown className="size-3.5 text-zinc-400 shrink-0" />
+              <ChevronDown className={cn("size-3.5 text-zinc-400 shrink-0 transition-transform duration-200", isDatePopoverOpen && "rotate-180")} />
             </button>
 
             {isDatePopoverOpen && (
@@ -448,13 +457,13 @@ export function TransactionView() {
                 <div className="fixed inset-0 z-20 cursor-default" onClick={() => setIsDatePopoverOpen(false)} />
                 
                 {/* Calendar Month/Year popover panel */}
-                <div className="absolute left-0 top-11 z-30 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg">
+                <div className="absolute left-0 top-11.5 z-30 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-top-2 duration-150">
                   {/* Popover Header */}
-                  <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-100">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
                     <button
                       type="button"
                       onClick={handlePrevYear}
-                      className="p-1.5 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center"
+                      className="p-1 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
                     >
                       <ChevronLeft className="size-4" />
                     </button>
@@ -462,7 +471,7 @@ export function TransactionView() {
                     <button
                       type="button"
                       onClick={handleNextYear}
-                      className="p-1.5 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center"
+                      className="p-1 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
                     >
                       <ChevronRight className="size-4" />
                     </button>
@@ -483,12 +492,12 @@ export function TransactionView() {
                             handleYearDateFilterChange(newMonthYear);
                             setIsDatePopoverOpen(false);
                           }}
-                          className={`py-2.5 px-1 text-xs rounded-xl font-medium transition-all cursor-pointer text-center relative border-0
-                            ${isSelected
-                              ? "bg-zinc-900 text-white font-semibold shadow-sm"
+                          className={cn(
+                            "py-2.5 px-1 text-xs rounded-xl font-medium transition-all cursor-pointer text-center relative border-0",
+                            isSelected
+                              ? "bg-zinc-900 text-white font-semibold shadow-sm hover:bg-zinc-850"
                               : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
-                            }
-                          `}
+                          )}
                         >
                           {month.shortLabel}
                           {isToday && !isSelected && (

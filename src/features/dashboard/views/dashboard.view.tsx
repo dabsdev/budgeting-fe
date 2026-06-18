@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useDashboardSummaryQuery } from "../api/dashboard.queries";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { Route as AuthRoute } from "@/routes/_auth";
 import {
   Wallet,
@@ -14,6 +14,7 @@ import {
   Bell,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -202,10 +203,16 @@ export function DashboardView() {
         <div className="relative self-start md:self-auto select-none">
           <button
             onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-            className="flex items-center gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer"
+            className={cn(
+              "flex items-center justify-between gap-2.5 bg-white border border-zinc-200 rounded-xl px-4 h-10 shadow-sm text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition-all select-none cursor-pointer w-full md:w-auto",
+              isPopoverOpen && "ring-1 ring-zinc-950 border-zinc-950"
+            )}
           >
-            <Calendar className="size-4 text-zinc-400" />
-            <span>{formattedActiveMonthYear}</span>
+            <div className="flex items-center gap-2">
+              <Calendar className="size-4 text-zinc-400" />
+              <span>{formattedActiveMonthYear}</span>
+            </div>
+            <ChevronDown className={cn("size-3.5 text-zinc-400 transition-transform duration-200", isPopoverOpen && "rotate-180")} />
           </button>
 
           {isPopoverOpen && (
@@ -214,19 +221,19 @@ export function DashboardView() {
               <div className="fixed inset-0 z-20 cursor-default" onClick={() => setIsPopoverOpen(false)} />
               
               {/* Calendar Month/Year popover panel */}
-              <div className="absolute left-0 md:left-auto md:right-0 top-11 z-30 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg">
+              <div className="absolute left-0 md:left-auto md:right-0 top-11.5 z-30 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-top-2 duration-150">
                 {/* Popover Header */}
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-100">
+                <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
                   <button
                     onClick={handlePrevYear}
-                    className="p-1.5 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
                   >
                     <ChevronLeft className="size-4" />
                   </button>
                   <span className="font-bold text-sm text-zinc-800">{viewingYear}</span>
                   <button
                     onClick={handleNextYear}
-                    className="p-1.5 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
                   >
                     <ChevronRight className="size-4" />
                   </button>
@@ -242,12 +249,12 @@ export function DashboardView() {
                       <button
                         key={month.value}
                         onClick={() => handleSelectMonth(month.value)}
-                        className={`py-2.5 px-1 text-xs rounded-xl font-medium transition-all cursor-pointer text-center relative
-                          ${isSelected
-                            ? "bg-zinc-900 text-white font-semibold shadow-sm"
-                            : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
-                          }
-                        `}
+                        className={cn(
+                          "py-2.5 px-1 text-xs rounded-xl font-medium transition-all cursor-pointer text-center relative border-0",
+                          isSelected
+                            ? "bg-zinc-900 text-white font-semibold shadow-sm hover:bg-zinc-850"
+                            : "text-zinc-655 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
+                        )}
                       >
                         {month.shortLabel}
                         {isToday && !isSelected && (

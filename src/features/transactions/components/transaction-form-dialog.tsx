@@ -72,7 +72,7 @@ export function TransactionFormDialog({ isOpen, onClose, transaction, initialTab
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white border border-zinc-150 rounded-2xl w-full max-w-md shadow-xl overflow-hidden relative max-h-[90vh] flex flex-col"
+              className="bg-white border border-zinc-150 rounded-2xl w-full max-w-md shadow-xl relative"
             >
               {/* Close Button */}
               <button
@@ -150,8 +150,8 @@ export function TransactionFormDialog({ isOpen, onClose, transaction, initialTab
                 )}
               </div>
 
-              {/* Scrollable Form Content */}
-              <div className="overflow-y-auto flex-1">
+              {/* Form Content */}
+              <div className="w-full">
                 {isTransferEdit && (
                   <div className="m-6 mb-2 p-3 bg-amber-50 border border-amber-100 rounded-xl flex gap-2.5 text-amber-800 text-xs text-left">
                     <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600" />
@@ -1068,7 +1068,7 @@ function CustomDatePicker({
           {/* Backdrop layer to click outside and dismiss */}
           <div className="fixed inset-0 z-40 cursor-default" onClick={() => setIsOpen(false)} />
           {/* Calendar Picker Card */}
-          <div className="absolute right-0 bottom-full mb-2 z-50 w-72 bg-white border border-zinc-150 rounded-xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-bottom-2 duration-150">
+          <div className="absolute right-0 top-12.5 z-50 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-top-2 duration-150">
             {/* Calendar Picker Header */}
             <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
               <button
