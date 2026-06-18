@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, X, AlertCircle, Calendar, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { BottomSheet, useIsMobile } from "@/components/ui/bottom-sheet";
 import { createPortal } from "react-dom";
 
 interface DayPickerProps {
@@ -17,6 +18,7 @@ interface DayPickerProps {
 function DayPicker({ value, onChange }: DayPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const isMobile = useIsMobile();
 
   return (
     <div className="relative w-full">
@@ -35,7 +37,7 @@ function DayPicker({ value, onChange }: DayPickerProps) {
         <ChevronDown className={cn("size-4 text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} />
       </button>
 
-      {isOpen && (
+      {isOpen && !isMobile && (
         <>
           <div className="fixed inset-0 z-45 cursor-default" onClick={() => setIsOpen(false)} />
           <div className="absolute left-0 top-12.5 z-50 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none w-72 animate-in fade-in slide-in-from-top-2 duration-150">
@@ -57,7 +59,7 @@ function DayPicker({ value, onChange }: DayPickerProps) {
                       "size-8 text-xs font-semibold rounded-lg flex items-center justify-center transition-all cursor-pointer border-0",
                       isSelected
                         ? "bg-zinc-900 text-white shadow-sm hover:bg-zinc-850"
-                        : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
+                        : "text-zinc-650 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
                     )}
                   >
                     {day}
@@ -67,6 +69,43 @@ function DayPicker({ value, onChange }: DayPickerProps) {
             </div>
           </div>
         </>
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Select Salary Day"
+        >
+          <div className="flex justify-center w-full pb-4">
+            <div className="w-72 bg-white flex flex-col gap-3 select-none">
+              <div className="grid grid-cols-7 gap-2">
+                {days.map((day) => {
+                  const isSelected = value === day;
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => {
+                        onChange(day);
+                        setIsOpen(false);
+                      }}
+                      className={cn(
+                        "size-8.5 text-xs.5 font-bold rounded-xl flex items-center justify-center transition-all cursor-pointer border border-transparent",
+                        isSelected
+                          ? "bg-zinc-900 text-white shadow-md font-bold"
+                          : "text-zinc-700 bg-zinc-50 hover:bg-zinc-100 hover:text-zinc-900"
+                      )}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </BottomSheet>
       )}
     </div>
   );

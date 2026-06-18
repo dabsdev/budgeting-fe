@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { BottomSheet, useIsMobile } from "@/components/ui/bottom-sheet";
 import { transactionSchema, transferSchema, type Transaction } from "../api/transaction.contract";
 import {
   useCreateTransactionMutation,
@@ -885,6 +886,7 @@ export function CustomSelect({
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((opt) => opt.value === value);
+  const isMobile = useIsMobile();
 
   return (
     <div className="relative w-full">
@@ -916,7 +918,7 @@ export function CustomSelect({
         <ChevronDown className={cn("size-4 text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} />
       </button>
 
-      {isOpen && (
+      {isOpen && !isMobile && (
         <>
           {/* Backdrop layer to click outside and dismiss */}
           <div className="fixed inset-0 z-40 cursor-default" onClick={() => setIsOpen(false)} />
@@ -936,7 +938,7 @@ export function CustomSelect({
                     "w-full text-left py-2 px-3 text-sm font-medium rounded-lg transition-all cursor-pointer flex items-center justify-between gap-2",
                     isSelected
                       ? "bg-zinc-900 text-white font-semibold shadow-sm"
-                      : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                      : "text-zinc-650 hover:bg-zinc-50 hover:text-zinc-900"
                   )}
                 >
                   <div className="truncate flex items-baseline gap-1.5">
@@ -957,6 +959,50 @@ export function CustomSelect({
           </div>
         </>
       )}
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title={placeholder}
+        >
+          <div className="flex flex-col gap-1.5 w-full">
+            {options.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    "w-full text-left py-3.5 px-4 text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-between gap-3 border border-transparent select-none",
+                    isSelected
+                      ? "bg-zinc-900 text-white font-bold shadow-md"
+                      : "text-zinc-650 bg-zinc-50 hover:bg-zinc-100 hover:text-zinc-900"
+                  )}
+                >
+                  <div className="truncate flex items-baseline gap-2">
+                    <span className="text-sm">{opt.label}</span>
+                    {opt.sublabel && (
+                      <span className={cn(
+                        "text-xs select-none font-medium",
+                        isSelected ? "text-zinc-300" : "text-zinc-400"
+                      )}>
+                        {opt.sublabel}
+                      </span>
+                    )}
+                  </div>
+                  {isSelected && <Check className="size-4.5 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </BottomSheet>
+      )}
     </div>
   );
 }
@@ -974,6 +1020,7 @@ function CustomDatePicker({
   hasError?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   // Parse current selected date
   const parsedDate = value ? new Date(value) : new Date();
@@ -1063,7 +1110,7 @@ function CustomDatePicker({
         <ChevronDown className={cn("size-4 text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} />
       </button>
 
-      {isOpen && (
+      {isOpen && !isMobile && (
         <>
           {/* Backdrop layer to click outside and dismiss */}
           <div className="fixed inset-0 z-40 cursor-default" onClick={() => setIsOpen(false)} />
@@ -1134,6 +1181,83 @@ function CustomDatePicker({
             </div>
           </div>
         </>
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Select Date"
+        >
+          <div className="flex justify-center w-full pb-4">
+            <div className="w-72 bg-white flex flex-col gap-3 select-none">
+              {/* Calendar Picker Header */}
+              <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  className="p-1 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
+                >
+                  <ChevronLeft className="size-4" />
+                </button>
+                <span className="font-bold text-xs.5 text-zinc-800">
+                  {monthNames[month]} {year}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  className="p-1 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </div>
+
+              {/* Days of week header */}
+              <div className="grid grid-cols-7 gap-1 text-center">
+                {daysOfWeek.map((day) => (
+                  <span key={day} className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                    {day}
+                  </span>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {daysArray.map((day, idx) => {
+                  if (day === null) {
+                    return <div key={`empty-${idx}`} />;
+                  }
+                  
+                  const currentDateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                  const isSelected = value === currentDateStr;
+                  
+                  const today = new Date();
+                  const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+
+                  return (
+                    <button
+                      key={`day-${day}`}
+                      type="button"
+                      onClick={() => handleSelectDay(day)}
+                      className={cn(
+                        "size-8 text-xs font-semibold rounded-lg flex items-center justify-center transition-all cursor-pointer relative",
+                        isSelected
+                          ? "bg-zinc-900 text-white shadow-sm hover:bg-zinc-850"
+                          : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900"
+                      )}
+                    >
+                      {day}
+                      {isToday && !isSelected && (
+                        <span className="absolute bottom-1 size-1 rounded-full bg-zinc-900" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </BottomSheet>
       )}
     </div>
   );

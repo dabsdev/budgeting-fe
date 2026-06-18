@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, X, Calendar, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { BottomSheet, useIsMobile } from "@/components/ui/bottom-sheet";
 import type { Budget } from "../api/budget.contract";
 import { useCreateBudgetMutation as useCreateBudgetMutationHook, useUpdateBudgetMutation as useUpdateBudgetMutationHook } from "../api/budget.mutations";
 import { createPortal } from "react-dom";
@@ -42,6 +43,7 @@ function MonthYearPicker({ selectedMonth, selectedYear, onChange }: MonthYearPic
   const [isOpen, setIsOpen] = useState(false);
   const [viewingYear, setViewingYear] = useState(parseInt(selectedYear));
   const [lastSelectedYear, setLastSelectedYear] = useState(selectedYear);
+  const isMobile = useIsMobile();
 
   if (selectedYear !== lastSelectedYear) {
     setLastSelectedYear(selectedYear);
@@ -80,7 +82,7 @@ function MonthYearPicker({ selectedMonth, selectedYear, onChange }: MonthYearPic
         <ChevronDown className={cn("size-4 text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} />
       </button>
 
-      {isOpen && (
+      {isOpen && !isMobile && (
         <>
           <div className="fixed inset-0 z-45 cursor-default" onClick={() => setIsOpen(false)} />
           <div className="absolute left-0 top-12.5 z-50 w-72 bg-white border border-zinc-150 rounded-2xl p-4 shadow-lg flex flex-col gap-3 select-none animate-in fade-in slide-in-from-top-2 duration-150">
@@ -116,7 +118,7 @@ function MonthYearPicker({ selectedMonth, selectedYear, onChange }: MonthYearPic
                       "py-2.5 px-1 text-xs rounded-xl font-medium transition-all cursor-pointer text-center relative border-0",
                       isSelected
                         ? "bg-zinc-900 text-white font-semibold shadow-sm hover:bg-zinc-850"
-                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
+                        : "text-zinc-650 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
                     )}
                   >
                     {month.shortLabel}
@@ -129,6 +131,65 @@ function MonthYearPicker({ selectedMonth, selectedYear, onChange }: MonthYearPic
             </div>
           </div>
         </>
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Select Period"
+        >
+          <div className="flex justify-center w-full pb-4">
+            <div className="w-72 bg-white flex flex-col gap-3 select-none">
+              {/* Year Select Header */}
+              <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
+                <button
+                  type="button"
+                  onClick={handlePrevYear}
+                  className="p-1 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
+                >
+                  <ChevronLeft className="size-4" />
+                </button>
+                <span className="font-bold text-sm text-zinc-800">{viewingYear}</span>
+                <button
+                  type="button"
+                  onClick={handleNextYear}
+                  className="p-1 rounded-lg hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-all cursor-pointer border-0 bg-transparent flex items-center justify-center size-7"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </div>
+
+              {/* Month Grid */}
+              <div className="grid grid-cols-3 gap-2">
+                {MONTHS.map((month) => {
+                  const isSelected = selectedYear === String(viewingYear) && selectedMonth === month.value;
+                  const isToday = todayYear === String(viewingYear) && todayMonth === month.value;
+
+                  return (
+                    <button
+                      key={month.value}
+                      type="button"
+                      onClick={() => handleSelectMonth(month.value)}
+                      className={cn(
+                        "py-3 px-1 text-xs.5 rounded-xl font-medium transition-all cursor-pointer text-center relative border-0",
+                        isSelected
+                          ? "bg-zinc-900 text-white font-semibold shadow-sm hover:bg-zinc-850"
+                          : "text-zinc-650 hover:bg-zinc-50 hover:text-zinc-900 bg-transparent"
+                      )}
+                    >
+                      {month.shortLabel}
+                      {isToday && !isSelected && (
+                        <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 size-1 rounded-full bg-zinc-900" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </BottomSheet>
       )}
     </div>
   );
