@@ -16,6 +16,7 @@ import {
 } from "../api/transaction.mutations";
 import { useWalletsQuery } from "@/features/wallets/api/wallet.queries";
 import { useBudgetsQuery } from "@/features/budgets/api/budget.queries";
+import { Route as AuthRoute } from "@/routes/_auth";
 
 interface TransactionFormDialogProps {
   isOpen: boolean;
@@ -210,8 +211,83 @@ function TransactionForm({ transaction, isTransferEdit, onClose }: TransactionFo
     return "OUT";
   });
 
-  // Dynamic budget list fetching based on selected transaction month
-  const activeMonthYear = txDate.substring(0, 7); // "YYYY-MM"
+  const user = AuthRoute.useLoaderData();
+  const salaryDay = user?.salary_day ?? 1;
+
+  // Helper function to get backend cycle date range for checking
+  const getBackendCycleDateRange = (monthYear: string, sDay: number) => {
+    const [yearStr, monthStr] = monthYear.split("-");
+    const year = parseInt(yearStr, 10);
+    const monthIndex = parseInt(monthStr, 10) - 1; // 0-indexed month
+
+    if (sDay === 1) {
+      const startDateObj = new Date(Date.UTC(year, monthIndex, 1));
+      const endDateObj = new Date(Date.UTC(year, monthIndex + 1, 0));
+      return {
+        startDate: startDateObj.toISOString().substring(0, 10),
+        endDate: endDateObj.toISOString().substring(0, 10)
+      };
+    }
+
+    let prevMonthIndex = monthIndex - 1;
+    let prevYear = year;
+    if (prevMonthIndex < 0) {
+      prevMonthIndex = 11;
+      prevYear -= 1;
+    }
+
+    let startDateObj = new Date(Date.UTC(prevYear, prevMonthIndex, sDay));
+    const actualStartMonth = startDateObj.getUTCMonth();
+    if (actualStartMonth !== prevMonthIndex) {
+      startDateObj = new Date(Date.UTC(prevYear, prevMonthIndex + 1, 0));
+    }
+
+    let currentSalaryDayObj = new Date(Date.UTC(year, monthIndex, sDay));
+    const actualCurrentMonth = currentSalaryDayObj.getUTCMonth();
+    if (actualCurrentMonth !== monthIndex) {
+      currentSalaryDayObj = new Date(Date.UTC(year, monthIndex + 1, 0));
+    }
+
+    const endDateObj = new Date(currentSalaryDayObj.getTime() - 24 * 60 * 60 * 1000);
+
+    const startDate = startDateObj.toISOString().substring(0, 10);
+    const endDate = endDateObj.toISOString().substring(0, 10);
+
+    return { startDate, endDate };
+  };
+
+  const getCycleMonth = (dateStr: string, sDay: number): string => {
+    if (sDay === 1) {
+      return dateStr.substring(0, 7);
+    }
+
+    const [yearStr, monthStr] = dateStr.split("-");
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10);
+
+    const formatYM = (y: number, m: number) => {
+      return `${y}-${String(m).padStart(2, "0")}`;
+    };
+
+    const candidates = [
+      { y: year, m: month },
+      { y: month === 12 ? year + 1 : year, m: month === 12 ? 1 : month + 1 },
+      { y: month === 1 ? year - 1 : year, m: month === 1 ? 12 : month - 1 },
+    ];
+
+    for (const cand of candidates) {
+      const ym = formatYM(cand.y, cand.m);
+      const { startDate, endDate } = getBackendCycleDateRange(ym, sDay);
+      if (dateStr >= startDate && dateStr <= endDate) {
+        return ym;
+      }
+    }
+
+    return dateStr.substring(0, 7);
+  };
+
+  // Dynamic budget list fetching based on selected transaction month's budget cycle
+  const activeMonthYear = getCycleMonth(txDate, salaryDay);
   const { data: budgetsRes } = useBudgetsQuery({ month_year: activeMonthYear, limit: 100 });
   const budgetsList = budgetsRes?.data || [];
 

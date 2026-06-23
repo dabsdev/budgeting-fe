@@ -23,19 +23,32 @@ function getCycleDateRange(monthYear: string, salaryDay: number): { startDate: D
   const year = parseInt(yearStr, 10);
   const monthIndex = parseInt(monthStr, 10) - 1; // 0-indexed month
 
-  let startDateObj = new Date(Date.UTC(year, monthIndex, salaryDay));
-  if (startDateObj.getUTCMonth() !== monthIndex) {
-    startDateObj = new Date(Date.UTC(year, monthIndex + 1, 0));
+  if (salaryDay === 1) {
+    const startDateObj = new Date(Date.UTC(year, monthIndex, 1));
+    const endDateObj = new Date(Date.UTC(year, monthIndex + 1, 0));
+    return { startDate: startDateObj, endDate: endDateObj };
   }
 
-  const nextMonthIndex = (monthIndex + 1) % 12;
-  const nextYear = monthIndex === 11 ? year + 1 : year;
-  let nextDateObj = new Date(Date.UTC(nextYear, nextMonthIndex, salaryDay));
-  if (nextDateObj.getUTCMonth() !== nextMonthIndex) {
-    nextDateObj = new Date(Date.UTC(nextYear, nextMonthIndex + 1, 0));
+  let prevMonthIndex = monthIndex - 1;
+  let prevYear = year;
+  if (prevMonthIndex < 0) {
+    prevMonthIndex = 11;
+    prevYear -= 1;
   }
 
-  const endDateObj = new Date(nextDateObj.getTime() - 24 * 60 * 60 * 1000);
+  let startDateObj = new Date(Date.UTC(prevYear, prevMonthIndex, salaryDay));
+  const actualStartMonth = startDateObj.getUTCMonth();
+  if (actualStartMonth !== prevMonthIndex) {
+    startDateObj = new Date(Date.UTC(prevYear, prevMonthIndex + 1, 0));
+  }
+
+  let currentSalaryDayObj = new Date(Date.UTC(year, monthIndex, salaryDay));
+  const actualCurrentMonth = currentSalaryDayObj.getUTCMonth();
+  if (actualCurrentMonth !== monthIndex) {
+    currentSalaryDayObj = new Date(Date.UTC(year, monthIndex + 1, 0));
+  }
+
+  const endDateObj = new Date(currentSalaryDayObj.getTime() - 24 * 60 * 60 * 1000);
 
   return { startDate: startDateObj, endDate: endDateObj };
 }
